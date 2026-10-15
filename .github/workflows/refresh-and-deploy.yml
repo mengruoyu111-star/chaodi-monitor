@@ -21,8 +21,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      # 关键：按分支的最新提交检出，而不是按「触发事件当时的快照」。
+      # 否则排队等待的任务会拿到落后的基准，回写历史时必然被远端拒绝。
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -31,17 +37,41 @@ jobs:
       - name: 抓取行情并生成静态站点
         run: node scripts/snapshot.mjs
 
+      # 历史回写只是顺手存档，失败绝不能挡住部署，所以做了两层保护：
+      #   1. continue-on-error —— 推送失败也继续往下走，网站照常部署
+      #   2. pull --rebase + 重试 —— 处理远端已被另一个任务推进的情况
       - name: 把历史数据提交回仓库
+        continue-on-error: true
         run: |
+          set -u
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add data/history.json
           if git diff --staged --quiet; then
             echo "历史无变化，跳过提交"
-          else
-            git commit -m "chore: 更新历史数据 $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "chore: 更新历史数据 $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3 4 5; do
+            echo "--- 第 $i 次尝试推送 ---"
+            if git pull --rebase --autostash origin "$BRANCH"; then
+              if git push origin "HEAD:$BRANCH"; then
+                echo "历史数据已推送"
+                exit 0
+              fi
+            else
+              echo "rebase 有冲突，保留本次刚生成的历史文件"
+              git checkout --theirs data/history.json 2>/dev/null || true
+              git add data/history.json
+              GIT_EDITOR=true git rebase --continue || git rebase --skip || git rebase --abort || true
+            fi
+            sleep 3
+          done
+
+          echo "::warning::历史数据推送失败，本次跳过。网站照常部署，下一次任务会自动补上。"
 
       - uses: actions/configure-pages@v5
 
