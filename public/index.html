@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>抄底红线监测器 · 12 个数据指标</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📉</text></svg>">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">红线</span>
+    <div class="brand-text">
+      <h1>抄底红线监测器</h1>
+      <p>12 个数据指标 · 红线阈值实时监控</p>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <span class="mode-badge" id="modeBadge" hidden>只读快照</span>
+    <div class="status-pill" id="statusPill">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">加载中…</span>
+    </div>
+    <button class="btn btn-ghost" id="btnNotify" title="开启桌面通知与声音提醒">🔔 提醒</button>
+    <button class="btn local-only" id="btnRefresh">立即刷新</button>
+  </div>
+</header>
+
+<div class="alert-banner" id="alertBanner" hidden>
+  <span class="alert-icon">⚠</span>
+  <span id="alertBannerText"></span>
+  <button class="alert-close" id="alertClose" aria-label="关闭">×</button>
+</div>
+
+<main>
+
+  <!-- 顶部总览 -->
+  <section class="hero" id="hero">
+    <div class="hero-main">
+      <div class="hero-count">
+        <span class="big" id="heroCount">—</span>
+        <span class="slash">/</span>
+        <span class="total" id="heroTotal">12</span>
+        <span class="unit">条红线</span>
+      </div>
+      <div class="hero-level" id="heroLevel">等待数据</div>
+      <p class="hero-action" id="heroAction">正在读取行情数据…</p>
+      <p class="hero-position" id="heroPosition"></p>
+    </div>
+    <div class="hero-side">
+      <div class="score-ring" id="scoreRing">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="score-text"><b id="scoreValue">—</b><span>抄底评分</span></div>
+      </div>
+      <dl class="hero-meta">
+        <div><dt>盘中/盘后</dt><dd id="metaMarket">—</dd></div>
+        <div><dt>数据时间</dt><dd id="metaUpdated">—</dd></div>
+        <div><dt>下次刷新</dt><dd id="metaNext">—</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 红线计数条 -->
+  <section class="strip-card">
+    <div class="strip-head">
+      <h2>红线进度</h2>
+      <span class="strip-hint" id="stripHint">红线越多动手，胜率越高</span>
+    </div>
+    <div class="strip" id="strip"></div>
+    <div class="strip-scale">
+      <span>0</span><span class="mark mark-6">6 底仓</span><span class="mark mark-9">9 动手</span><span>12</span>
+    </div>
+  </section>
+
+  <!-- 指标卡片 -->
+  <section class="grid" id="grid" aria-live="polite"></section>
+
+  <!-- 历史趋势 -->
+  <section class="card chart-card">
+    <div class="card-head">
+      <h2>红线数量趋势</h2>
+      <div class="card-tools">
+        <span class="muted" id="chartRange">—</span>
+        <button class="btn btn-mini local-only" id="btnClearHistory">清空历史</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg id="chart" viewBox="0 0 900 240" preserveAspectRatio="none"></svg>
+      <div class="chart-empty" id="chartEmpty">还没有历史数据，启动后每次刷新都会自动记录一个点。</div>
+    </div>
+    <div class="chart-legend">
+      <span><i class="lg lg-line"></i>红线数量</span>
+      <span><i class="lg lg-6"></i>6 条（底仓）</span>
+      <span><i class="lg lg-9"></i>9 条（动手）</span>
+    </div>
+  </section>
+
+  <!-- 设置（仅本地服务模式） -->
+  <section class="card settings-card local-only">
+    <div class="card-head collapsible" id="settingsToggle">
+      <h2>阈值与手动维护</h2>
+      <span class="chev">▾</span>
+    </div>
+    <div class="settings-body" id="settingsBody" hidden>
+      <div class="settings-grid" id="settingsGrid"></div>
+      <div class="settings-actions">
+        <button class="btn" id="btnSave">保存设置</button>
+        <button class="btn btn-ghost" id="btnReset">恢复默认</button>
+        <span class="muted" id="settingsHint">修改阈值后会立即用当前数据重算，不需等下一次刷新。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 只读快照提示 -->
+  <section class="card readonly-note" id="readonlyNote" hidden>
+    <h2>这是只读快照</h2>
+    <p>你现在看的是托管在云端的静态版本，数据由定时任务刷新，任何人都不能在这里改阈值或历史。
+       要自己调阈值、手动标记指标，请在本地运行 <code>node server.mjs</code> 打开 http://127.0.0.1:8787 。</p>
+  </section>
+
+  <!-- 数据源 -->
+  <section class="card source-card">
+    <div class="card-head"><h2>数据源状态</h2><span class="muted" id="sourceMeta">—</span></div>
+    <ul class="source-list" id="sourceList"></ul>
+  </section>
+
+  <footer class="foot">
+    <p>规则来源：星球「Coming 星主」2026-10-15《12 个数据指标 + 红线阈值》原文。本工具只做数据聚合与阈值提示，不构成任何投资建议。</p>
+    <p class="muted">风险提示：市场有风险，投资需谨慎。</p>
+  </footer>
+
+</main>
+
+<div class="toasts" id="toasts"></div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

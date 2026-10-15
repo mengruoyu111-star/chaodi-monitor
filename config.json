@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "refreshSeconds": 120,
+  "alerts": {
+    "notify": true,
+    "sound": true
+  },
+  "thresholds": {
+    "vix1000": 35,
+    "margin": 2.45,
+    "marginAlt": 2.48,
+    "imBasis": 160,
+    "bigBear": 3,
+    "imPrice": 6600,
+    "kc50": 1250,
+    "sentiment": 3,
+    "sentimentCompensation": 10,
+    "pcrLow": 0.85,
+    "pcrNeed": 3
+  },
+  "params": {
+    "bigBear": {
+      "windowDays": 8,
+      "dropPct": 1.5,
+      "sizeBasis": "pct"
+    },
+    "volume": {
+      "volMa": 20,
+      "shrinkRatio": 0.85,
+      "shrinkDays": 3,
+      "expandRatio": 1.25,
+      "dropPct": 1.5,
+      "lookbackDays": 10,
+      "shrinkLookback": 30
+    },
+    "sizeRatio": {
+      "numerator": "0.399314",
+      "denominator": "0.399316",
+      "historyLimit": 1200,
+      "nearMaxRatio": 0.995
+    },
+    "pcr": {
+      "direction": "below"
+    }
+  },
+  "manual": {
+    "vix1000": {
+      "value": null,
+      "memo": "期权论坛的中证1000 QVIX 已停更，默认用中金所 MO 期权链自算；如需沿用原口径，可在此手动录入。"
+    },
+    "sizeRatio": {
+      "locked": true,
+      "triggered": true,
+      "memo": "原文：前几天已经触发，默认红线，触发即始终有效。"
+    },
+    "rateHike": {
+      "locked": false,
+      "triggered": true,
+      "memo": "今晚 CPI 公布后自动触发，默认红线；需跟踪，可能回落则去掉红线。"
+    },
+    "sentiment": {
+      "locked": false,
+      "triggered": false,
+      "value": null,
+      "compensation": null,
+      "memo": "韭圈情绪指数，必须极值（小于 3）；若等于 3 但补偿超过 10 也算触发。"
+    },
+    "tech": {
+      "locked": false,
+      "triggered": false,
+      "memo": "6 大科技点位无具体数据，重点看 CPO 和半导体。",
+      "updatedAt": "2026-10-15 11:54:15"
+    }
+  },
+  "pcrValues": {
+    "沪深300": null,
+    "中证500": null,
+    "中证1000": null,
+    "科创50": null
+  }
+}

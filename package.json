@@ -1,0 +1,16 @@
+{
+  "name": "chaodi-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "抄底红线监测器 —— 12 个数据指标的红线阈值监控与提醒",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "build": "node scripts/snapshot.mjs",
+    "refresh": "node server.mjs --once"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
