@@ -1,22 +1,22 @@
 {
   "points": [
     {
-      "ts": "2026-10-15 15:47:33",
+      "ts": "2026-10-15 15:55:04",
       "date": "2026-10-15",
-      "count": 3,
+      "count": 2,
       "total": 12,
-      "score": 25,
-      "level": "观察区",
+      "score": 17,
+      "level": "等待区",
       "values": {
         "vix1000": 31,
         "margin": 2.5056,
-        "imBasis": 125.05,
+        "imBasis": null,
         "bigBear": null,
         "volume": null,
         "sizeRatio": null,
         "rateHike": 1,
-        "imPrice": 6553.6,
-        "kc50": 1359.52,
+        "imPrice": null,
+        "kc50": null,
         "sentiment": null,
         "pcr": 1,
         "tech": 0
@@ -29,7 +29,7 @@
         "volume": false,
         "sizeRatio": true,
         "rateHike": true,
-        "imPrice": true,
+        "imPrice": false,
         "kc50": false,
         "sentiment": false,
         "pcr": false,
@@ -38,18 +38,18 @@
       "status": {
         "vix1000": "safe",
         "margin": "safe",
-        "imBasis": "safe",
+        "imBasis": "unknown",
         "bigBear": "unknown",
         "volume": "unknown",
         "sizeRatio": "triggered",
         "rateHike": "triggered",
-        "imPrice": "triggered",
-        "kc50": "safe",
+        "imPrice": "unknown",
+        "kc50": "unknown",
         "sentiment": "unknown",
         "pcr": "safe",
         "tech": "safe"
       },
-      "observedAt": "2026-10-15 15:47:33"
+      "observedAt": "2026-10-15 15:55:04"
     }
   ]
 }
