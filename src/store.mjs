@@ -125,23 +125,29 @@ export function loadRaw() {
 
 /**
  * 追加一条历史点：
- * - 同一分钟内不重复记录
- * - 每个交易日保留当日最后一个点 + 每 10 分钟一个盘中点
+ * - 每 10 分钟最多留一个点：落在同一个 10 分钟格子里的，用最新的覆盖
+ *   （这样无论刷新节奏是 2 分钟还是 30 分钟，趋势图粒度都稳定，且不会在整点丢点）
  */
+function stampToMs(ts) {
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(ts ?? '');
+  if (!m) return NaN;
+  // 用 UTC 组装，只用于算时间格子，不受运行机器时区影响
+  return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+}
+
+const SNAPSHOT_BUCKET_MS = 10 * 60 * 1000;
+const bucketOf = (ts) => Math.floor(stampToMs(ts) / SNAPSHOT_BUCKET_MS);
+
 export function appendSnapshot(points, snapshot) {
   const last = points[points.length - 1];
-  if (last && last.ts === snapshot.ts) return points;
+  if (!last) {
+    points.push(snapshot);
+    return points;
+  }
+  if (last.ts === snapshot.ts) return points;
 
-  const sameMinute = last && last.ts.slice(0, 16) === snapshot.ts.slice(0, 16);
-  if (sameMinute) return points;
-
-  const sameDay = last && last.date === snapshot.date;
-  const lastMinute = last ? Number(last.ts.slice(14, 16)) : -1;
-  const curMinute = Number(snapshot.ts.slice(14, 16));
-  const tenMinutesLater = sameDay && curMinute - lastMinute >= 10;
-
-  if (sameDay && !tenMinutesLater) {
-    // 覆盖当天最后一条，保证「当日最新」始终可见
+  // 同一个 10 分钟格子：覆盖，保留最新值
+  if (bucketOf(last.ts) === bucketOf(snapshot.ts)) {
     points[points.length - 1] = snapshot;
     return points;
   }
