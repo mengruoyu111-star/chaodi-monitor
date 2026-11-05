@@ -1529,6 +1529,57 @@
         "tech": "safe"
       },
       "observedAt": "2026-11-05 15:29:00"
+    },
+    {
+      "ts": "2026-11-05 23:42:01",
+      "date": "2026-11-05",
+      "count": 4,
+      "total": 12,
+      "score": 33,
+      "level": "观察区",
+      "values": {
+        "vix1000": 33.61,
+        "margin": 2.2718,
+        "imBasis": 45.14,
+        "bigBear": 4,
+        "volume": 0,
+        "sizeRatio": null,
+        "rateHike": 1,
+        "imPrice": 6605,
+        "kc50": 1286.68,
+        "sentiment": null,
+        "pcr": 2,
+        "tech": 0
+      },
+      "flags": {
+        "vix1000": false,
+        "margin": true,
+        "imBasis": false,
+        "bigBear": true,
+        "volume": false,
+        "sizeRatio": true,
+        "rateHike": true,
+        "imPrice": false,
+        "kc50": false,
+        "sentiment": false,
+        "pcr": false,
+        "tech": false
+      },
+      "status": {
+        "vix1000": "safe",
+        "margin": "triggered",
+        "imBasis": "safe",
+        "bigBear": "triggered",
+        "volume": "safe",
+        "sizeRatio": "triggered",
+        "rateHike": "triggered",
+        "imPrice": "safe",
+        "kc50": "safe",
+        "sentiment": "unknown",
+        "pcr": "safe",
+        "tech": "safe"
+      },
+      "observedAt": "2026-11-05 23:42:01"
     }
   ]
 }
